@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+
+<title>Qibla Pro</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<style>
+@font-face {
+  font-family: 'Inter';
+  src: url('fonts/Inter.woff2') format('woff2');
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+:root {
+  --bg:#0f172a;
+  --card:rgba(30,41,59,.7);
+  --gold:#d4af37;
+  --text:#f8fafc;
+  --dim:#94a3b8;
+}
+
+body {
+  margin:0;
+  font-family:Inter,sans-serif;
+  background:radial-gradient(circle,#1e293b,#0f172a);
+  color:var(--text);
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px;
+}
+
+h1 {
+  font-weight:300;
+  letter-spacing:4px;
+  color:var(--gold);
+}
+
+.compass {
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition:transform .25s ease-out;
+}
+
+.needle {
+  width:4px;
+  height:100%;
+  background:linear-gradient(to top,transparent 50%,var(--gold) 50%);
+}
+
+.panel {
+  background:var(--card);
+  backdrop-filter:blur(10px);
+  padding:20px;
+  border-radius:20px;
+  text-align:center;
+  width:100%;
+  max-width:320px;
+}
+
+button {
+  margin-top:20px;
+  padding:14px 30px;
+  border:none;
+  border-radius:40px;
+  background:var(--gold);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>QIBLA PRO</h1>
+
+<div class="compass" id="compass">
+  <div class="needle"></div>
+</div>
+
+<div class="panel">
+  <div>Direction</div>
+  <div id="angle" style="font-size:2.5rem">--°</div>
+  <div id="status">En attente GPS…</div>
+  <button id="start">ACTIVER</button>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
+const KAABA={lat:21.422487,lng:39.826206};
+let qibla=0;
+
+function qiblaAngle(lat,lng){
+  const φ1=lat*Math.PI/180;
+  const φ2=KAABA.lat*Math.PI/180;
+  const Δ=(KAABA.lng-lng)*Math.PI/180;
+  return (Math.atan2(Math.sin(Δ),
+    Math.cos(φ1)*Math.tan(φ2)-Math.sin(φ1)*Math.cos(Δ)
+  )*180/Math.PI+360)%360;
+}
+
+function orient(e){
+  let h=null;
+  if(e.webkitCompassHeading!==undefined) h=e.webkitCompassHeading;
+  else if(e.alpha!==null) h=360-e.alpha;
+  if(h!==null){
+    document.getElementById("compass")
+      .style.transform=`rotate(${qibla-h}deg)`;
+  }
+}
+
+document.getElementById("start").onclick=async()=>{
+  navigator.geolocation.watchPosition(p=>{
+    qibla=qiblaAngle(p.coords.latitude,p.coords.longitude);
+    document.getElementById("angle").innerText=Math.round(qibla)+"°";
+    document.getElementById("status").innerText="Signal OK";
+  });
+
+  if(typeof DeviceOrientationEvent?.requestPermission==="function"){
+    const perm=await DeviceOrientationEvent.requestPermission();
+    if(perm!=="granted") return;
+  }
+
+  window.addEventListener("deviceorientation",orient,true);
+  document.getElementById("start").style.display="none";
+};
+</script>
+
+</body>
+</html>
