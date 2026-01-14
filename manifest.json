@@ -1,22 +1,70 @@
 {
-  "name": "Qibla Pro",
-  "short_name": "Qibla",
-  "description": "Boussole Qibla hors ligne précise",
-  "start_url": "/index.html",
+  "name": "Qibla Finder Pro",
+  "short_name": "Qibla Pro",
+  "description": "Application de boussole Qibla avec mode hors ligne pour trouver la direction de la Kaaba",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
   "orientation": "portrait",
+  "scope": "/",
+  "lang": "fr-FR",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "icon-qibla-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "https://cdn-icons-png.flaticon.com/128/2823/2823023.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "icon-qibla-512.png",
+      "src": "https://cdn-icons-png.flaticon.com/192/2823/2823023.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2823/2823023.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2823/2823023.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["lifestyle", "utilities", "navigation"],
+  "shortcuts": [
+    {
+      "name": "Ouvrir Qibla",
+      "short_name": "Qibla",
+      "description": "Trouver la direction de la Kaaba",
+      "url": "/",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/192/2823/2823023.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded"
+  },
+  "permissions": [
+    "geolocation"
+  ],
+  "features": [
+    "geolocation",
+    "deviceorientation"
   ]
 }
