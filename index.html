@@ -4,144 +4,845 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0f172a">
-
 <title>Qibla Pro</title>
 
+<!-- PWA Configuration -->
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2823/2823023.png">
+
+<!-- iOS Meta Tags -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Qibla Pro">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
-@font-face {
-  font-family: 'Inter';
-  src: url('fonts/Inter.woff2') format('woff2');
-  font-weight: 300 700;
-  font-display: swap;
-}
+    :root {
+        --bg-color: #0f172a;
+        --bg-gradient: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        --card-bg: rgba(30, 41, 59, 0.7);
+        --accent-gold: #d4af37;
+        --text-main: #f8fafc;
+        --text-dim: #94a3b8;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --ring-color: rgba(212, 175, 55, 0.2);
+    }
 
-:root {
-  --bg:#0f172a;
-  --card:rgba(30,41,59,.7);
-  --gold:#d4af37;
-  --text:#f8fafc;
-  --dim:#94a3b8;
-}
+    [data-theme="light"] {
+        --bg-color: #f1f5f9;
+        --bg-gradient: radial-gradient(circle at center, #ffffff 0%, #e2e8f0 100%);
+        --card-bg: rgba(255, 255, 255, 0.8);
+        --accent-gold: #b8860b;
+        --text-main: #1e293b;
+        --text-dim: #64748b;
+        --ring-color: rgba(184, 134, 11, 0.2);
+    }
 
-body {
-  margin:0;
-  font-family:Inter,sans-serif;
-  background:radial-gradient(circle,#1e293b,#0f172a);
-  color:var(--text);
-  min-height:100svh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:space-between;
-  padding:20px;
-}
+    * { box-sizing: border-box; }
 
-h1 {
-  font-weight:300;
-  letter-spacing:4px;
-  color:var(--gold);
-}
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-color);
+        background-image: var(--bg-gradient);
+        color: var(--text-main);
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 100vh;
+        overflow-x: hidden;
+        padding: 20px;
+        transition: background-color 0.4s ease, color 0.4s ease;
+    }
 
-.compass {
-  width:220px;
-  height:220px;
-  border-radius:50%;
-  position:relative;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  transition:transform .25s ease-out;
-}
+    .theme-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: var(--card-bg);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-gold);
+        backdrop-filter: blur(5px);
+        z-index: 100;
+        transition: transform 0.2s;
+    }
 
-.needle {
-  width:4px;
-  height:100%;
-  background:linear-gradient(to top,transparent 50%,var(--gold) 50%);
-}
+    .theme-toggle:active {
+        transform: scale(0.95);
+    }
 
-.panel {
-  background:var(--card);
-  backdrop-filter:blur(10px);
-  padding:20px;
-  border-radius:20px;
-  text-align:center;
-  width:100%;
-  max-width:320px;
-}
+    .offline-indicator {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        z-index: 100;
+        animation: pulse 2s infinite;
+    }
 
-button {
-  margin-top:20px;
-  padding:14px 30px;
-  border:none;
-  border-radius:40px;
-  background:var(--gold);
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-}
+    .offline-indicator.show {
+        display: flex;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    .online-indicator {
+        background: rgba(16, 185, 129, 0.9);
+    }
+
+    .header { 
+        text-align: center; 
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+    
+    h1 { 
+        font-weight: 300; 
+        letter-spacing: 4px; 
+        text-transform: uppercase; 
+        font-size: 1.2rem; 
+        margin: 0; 
+        color: var(--accent-gold); 
+    }
+    
+    .instruction { 
+        font-size: 0.85rem; 
+        color: var(--text-dim); 
+        margin-top: 8px; 
+    }
+
+    .compass-area {
+        position: relative;
+        width: 280px;
+        height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .outer-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 1px solid var(--ring-color);
+        border-radius: 50%;
+        box-shadow: 0 0 40px rgba(0,0,0,0.1);
+    }
+
+    .cardinal-marks {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-dim);
+    }
+
+    .cardinal-marks span {
+        position: absolute;
+        transform: translate(-50%, -50%);
+    }
+
+    .north { top: 10px; left: 50%; color: var(--accent-gold); }
+    .east { top: 50%; right: 10px; }
+    .south { bottom: 10px; left: 50%; }
+    .west { top: 50%; left: 10px; }
+
+    #compass {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        will-change: transform;
+    }
+
+    .needle {
+        position: absolute;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to top, transparent 50%, var(--accent-gold) 50%);
+        border-radius: 2px;
+    }
+
+    .needle::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 20px solid var(--accent-gold);
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .kaaba-icon {
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        fill: var(--accent-gold);
+        filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+    }
+
+    .center-dot {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        background: var(--accent-gold);
+        border-radius: 50%;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    }
+
+    .info-panel {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 20px;
+        width: 100%;
+        max-width: 320px;
+        border: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .angle-value { 
+        font-size: 2.5rem; 
+        font-weight: 700; 
+        display: block; 
+        margin: 5px 0; 
+    }
+    
+    .label { 
+        font-size: 0.7rem; 
+        text-transform: uppercase; 
+        letter-spacing: 2px; 
+        color: var(--text-dim); 
+    }
+
+    #startBtn {
+        background: var(--accent-gold);
+        color: white;
+        border: none;
+        padding: 16px 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    #startBtn:active {
+        transform: scale(0.98);
+    }
+
+    #startBtn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        margin-top: 10px;
+        font-weight: 500;
+    }
+
+    .status-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .status-warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .status-error {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--error);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .info-item {
+        text-align: center;
+    }
+
+    .info-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .info-label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-dim);
+    }
+
+    .calibration-tip {
+        margin-top: 15px;
+        padding: 12px;
+        background: rgba(245, 158, 11, 0.1);
+        border-radius: 12px;
+        font-size: 0.75rem;
+        color: var(--warning);
+        display: none;
+    }
+
+    .offline-mode-info {
+        margin-top: 15px;
+        padding: 12px;
+        background: rgba(59, 130, 246, 0.1);
+        border-radius: 12px;
+        font-size: 0.75rem;
+        color: #3b82f6;
+        display: none;
+        line-height: 1.5;
+    }
+
+    .offline-mode-info.show {
+        display: block;
+    }
+
+    @media (max-height: 700px) {
+        .compass-area {
+            width: 220px;
+            height: 220px;
+        }
+        #compass {
+            width: 180px;
+            height: 180px;
+        }
+        .angle-value {
+            font-size: 2rem;
+        }
+    }
 </style>
 </head>
-
 <body>
 
-<h1>QIBLA PRO</h1>
-
-<div class="compass" id="compass">
-  <div class="needle"></div>
+<div class="offline-indicator" id="offlineIndicator">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+        <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+    </svg>
+    Mode Hors Ligne
 </div>
 
-<div class="panel">
-  <div>Direction</div>
-  <div id="angle" style="font-size:2.5rem">--°</div>
-  <div id="status">En attente GPS…</div>
-  <button id="start">ACTIVER</button>
+<button class="theme-toggle" id="themeBtn" aria-label="Changer de thème">
+    <svg id="themeIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+</button>
+
+<div class="header">
+    <h1>Qibla Finder</h1>
+    <p class="instruction">Maintenez le téléphone à plat</p>
+</div>
+
+<div class="compass-area">
+    <div class="outer-ring"></div>
+    <div class="cardinal-marks">
+        <span class="north">N</span>
+        <span class="east">E</span>
+        <span class="south">S</span>
+        <span class="west">O</span>
+    </div>
+    <div id="compass">
+        <svg class="kaaba-icon" width="40" height="40" viewBox="0 0 24 24">
+            <path d="M19,6L12,2L5,6V18L12,22L19,18V6M12,4.3L17,7.15V11L12,8.15L7,11V7.15L12,4.3M7,13L12,10.15L17,13V16.85L12,19.7L7,16.85V13Z"/>
+        </svg>
+        <div class="needle"></div>
+        <div class="center-dot"></div>
+    </div>
+</div>
+
+<div class="info-panel">
+    <span class="label">Direction de la Kaaba</span>
+    <span class="angle-value" id="qibla-display">--°</span>
+    
+    <div id="status-container">
+        <div id="status-text" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 10px;">
+            En attente...
+        </div>
+    </div>
+
+    <div class="info-grid" id="info-grid" style="display: none;">
+        <div class="info-item">
+            <span class="info-value" id="precision-value">--</span>
+            <span class="info-label">Précision GPS</span>
+        </div>
+        <div class="info-item">
+            <span class="info-value" id="heading-value">--°</span>
+            <span class="info-label">Cap actuel</span>
+        </div>
+    </div>
+
+    <div class="calibration-tip" id="calibration-tip">
+        ⚠️ Tracez un 8 dans l'air avec votre téléphone pour calibrer la boussole
+    </div>
+
+    <div class="offline-mode-info" id="offlineModeInfo">
+        📍 Mode hors ligne : La dernière position connue est utilisée. La boussole fonctionne normalement.
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <button id="startBtn">ACTIVER LES CAPTEURS</button>
+    </div>
 </div>
 
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
-}
+(function() {
+    'use strict';
 
-const KAABA={lat:21.422487,lng:39.826206};
-let qibla=0;
+    // --- ENREGISTREMENT DU SERVICE WORKER ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('✅ Service Worker enregistré:', registration.scope);
+                    
+                    // Vérifier les mises à jour
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('🔄 Mise à jour du Service Worker détectée');
+                        
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Nouvelle version disponible
+                                if (confirm('Une nouvelle version est disponible ! Recharger ?')) {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.error('❌ Erreur Service Worker:', err);
+                });
+        });
+    }
 
-function qiblaAngle(lat,lng){
-  const φ1=lat*Math.PI/180;
-  const φ2=KAABA.lat*Math.PI/180;
-  const Δ=(KAABA.lng-lng)*Math.PI/180;
-  return (Math.atan2(Math.sin(Δ),
-    Math.cos(φ1)*Math.tan(φ2)-Math.sin(φ1)*Math.cos(Δ)
-  )*180/Math.PI+360)%360;
-}
+    // --- GESTION DU THÈME ---
+    const themeBtn = document.getElementById('themeBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    let currentTheme = 'dark';
+    
+    function updateThemeIcon(isLight) {
+        if (isLight) {
+            themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+        } else {
+            themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+        }
+    }
 
-function orient(e){
-  let h=null;
-  if(e.webkitCompassHeading!==undefined) h=e.webkitCompassHeading;
-  else if(e.alpha!==null) h=360-e.alpha;
-  if(h!==null){
-    document.getElementById("compass")
-      .style.transform=`rotate(${qibla-h}deg)`;
-  }
-}
+    themeBtn.addEventListener('click', () => {
+        if (currentTheme === 'light') {
+            document.documentElement.removeAttribute('data-theme');
+            currentTheme = 'dark';
+            updateThemeIcon(false);
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            currentTheme = 'light';
+            updateThemeIcon(true);
+        }
+    });
 
-document.getElementById("start").onclick=async()=>{
-  navigator.geolocation.watchPosition(p=>{
-    qibla=qiblaAngle(p.coords.latitude,p.coords.longitude);
-    document.getElementById("angle").innerText=Math.round(qibla)+"°";
-    document.getElementById("status").innerText="Signal OK";
-  });
+    // --- ÉLÉMENTS DOM ---
+    const compass = document.getElementById('compass');
+    const startBtn = document.getElementById('startBtn');
+    const qiblaDisplay = document.getElementById('qibla-display');
+    const statusText = document.getElementById('status-text');
+    const precisionValue = document.getElementById('precision-value');
+    const headingValue = document.getElementById('heading-value');
+    const infoGrid = document.getElementById('info-grid');
+    const calibrationTip = document.getElementById('calibration-tip');
+    const offlineIndicator = document.getElementById('offlineIndicator');
+    const offlineModeInfo = document.getElementById('offlineModeInfo');
 
-  if(typeof DeviceOrientationEvent?.requestPermission==="function"){
-    const perm=await DeviceOrientationEvent.requestPermission();
-    if(perm!=="granted") return;
-  }
+    // --- CONSTANTES ---
+    const KAABA = { lat: 21.422487, lng: 39.826206 };
+    const SMOOTHING_FACTOR = 0.3;
+    const STORAGE_KEY = 'qibla_last_position';
+    
+    // --- VARIABLES D'ÉTAT ---
+    let qiblaAngle = 0;
+    let currentHeading = 0;
+    let smoothedHeading = 0;
+    let watchId = null;
+    let isTracking = false;
+    let lastAccuracy = null;
+    let compassCalibrated = false;
+    let isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    let isOfflineMode = false;
+    let lastKnownPosition = null;
 
-  window.addEventListener("deviceorientation",orient,true);
-  document.getElementById("start").style.display="none";
-};
+    // --- GESTION HORS LIGNE ---
+    function savePosition(lat, lng, accuracy) {
+        const position = {
+            latitude: lat,
+            longitude: lng,
+            accuracy: accuracy,
+            timestamp: Date.now()
+        };
+        try {
+            // Sauvegarde en mémoire
+            lastKnownPosition = position;
+            // Tentative de sauvegarde locale (peut échouer dans certains environnements)
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(position));
+            }
+        } catch (e) {
+            console.log('Sauvegarde position en mémoire uniquement');
+        }
+    }
+
+    function loadLastPosition() {
+        try {
+            // D'abord vérifier la mémoire
+            if (lastKnownPosition) {
+                return lastKnownPosition;
+            }
+            // Sinon essayer le localStorage
+            if (typeof localStorage !== 'undefined') {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    lastKnownPosition = JSON.parse(saved);
+                    return lastKnownPosition;
+                }
+            }
+        } catch (e) {
+            console.log('Pas de position sauvegardée');
+        }
+        return null;
+    }
+
+    function useOfflineMode() {
+        const lastPos = loadLastPosition();
+        if (lastPos) {
+            const age = Math.floor((Date.now() - lastPos.timestamp) / 1000 / 60); // en minutes
+            qiblaAngle = getQiblaAngle(lastPos.latitude, lastPos.longitude);
+            qiblaDisplay.textContent = Math.round(qiblaAngle) + "°";
+            precisionValue.textContent = `Cache (${age}min)`;
+            
+            isOfflineMode = true;
+            isTracking = true;
+            offlineIndicator.classList.add('show');
+            offlineModeInfo.classList.add('show');
+            infoGrid.style.display = 'grid';
+            
+            updateStatus('Mode hors ligne activé', 'warning');
+            return true;
+        }
+        return false;
+    }
+
+    function updateOnlineStatus() {
+        if (navigator.onLine) {
+            offlineIndicator.classList.remove('show');
+            offlineIndicator.textContent = '🟢 En Ligne';
+            offlineIndicator.classList.add('online-indicator');
+            if (isOfflineMode) {
+                // Réactiver le GPS si on revient en ligne
+                setTimeout(() => {
+                    offlineIndicator.classList.remove('show');
+                    startGPSTracking();
+                }, 2000);
+            }
+        } else {
+            offlineIndicator.classList.add('show');
+            offlineIndicator.textContent = '📵 Mode Hors Ligne';
+            offlineIndicator.classList.remove('online-indicator');
+        }
+    }
+
+    // Écoute des changements de connexion
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    // --- CALCUL DE L'ANGLE QIBLA ---
+    function getQiblaAngle(lat, lng) {
+        const phi1 = lat * Math.PI / 180;
+        const phi2 = KAABA.lat * Math.PI / 180;
+        const deltaL = (KAABA.lng - lng) * Math.PI / 180;
+        
+        const y = Math.sin(deltaL);
+        const x = Math.cos(phi1) * Math.tan(phi2) - Math.sin(phi1) * Math.cos(deltaL);
+        
+        let angle = Math.atan2(y, x) * 180 / Math.PI;
+        return (angle + 360) % 360;
+    }
+
+    // --- LISSAGE DES VALEURS ---
+    function smoothValue(current, target, factor) {
+        let diff = target - current;
+        
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+        
+        return (current + diff * factor + 360) % 360;
+    }
+
+    // --- MISE À JOUR DU STATUT ---
+    function updateStatus(message, type = 'info') {
+        statusText.textContent = message;
+        statusText.className = 'status-badge';
+        
+        if (type === 'success') {
+            statusText.classList.add('status-success');
+        } else if (type === 'warning') {
+            statusText.classList.add('status-warning');
+        } else if (type === 'error') {
+            statusText.classList.add('status-error');
+        }
+    }
+
+    // --- GESTION GPS ---
+    function startGPSTracking() {
+        if (!navigator.geolocation) {
+            updateStatus('GPS non disponible', 'error');
+            // Essayer le mode hors ligne
+            if (!useOfflineMode()) {
+                updateStatus('Aucune position disponible', 'error');
+            }
+            return;
+        }
+
+        updateStatus('Recherche GPS...', 'warning');
+
+        watchId = navigator.geolocation.watchPosition(
+            position => {
+                const { latitude, longitude, accuracy } = position.coords;
+                
+                // Sauvegarder la position pour utilisation hors ligne
+                savePosition(latitude, longitude, accuracy);
+                
+                qiblaAngle = getQiblaAngle(latitude, longitude);
+                lastAccuracy = accuracy;
+                
+                qiblaDisplay.textContent = Math.round(qiblaAngle) + "°";
+                precisionValue.textContent = `±${Math.round(accuracy)}m`;
+                
+                infoGrid.style.display = 'grid';
+                isOfflineMode = false;
+                offlineModeInfo.classList.remove('show');
+                
+                if (accuracy > 50) {
+                    updateStatus('Signal GPS faible', 'warning');
+                    if (!compassCalibrated) {
+                        calibrationTip.style.display = 'block';
+                    }
+                } else {
+                    updateStatus('Signal GPS optimal', 'success');
+                    calibrationTip.style.display = 'none';
+                }
+                
+                isTracking = true;
+            },
+            error => {
+                let message = 'Erreur GPS';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        message = 'Permission GPS refusée';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        message = 'Position indisponible';
+                        // Essayer le mode hors ligne
+                        if (useOfflineMode()) {
+                            return;
+                        }
+                        break;
+                    case error.TIMEOUT:
+                        message = 'Délai GPS dépassé';
+                        // Essayer le mode hors ligne
+                        if (useOfflineMode()) {
+                            return;
+                        }
+                        break;
+                }
+                updateStatus(message, 'error');
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            }
+        );
+    }
+
+    // --- GESTION BOUSSOLE AMÉLIORÉE ---
+    function handleOrientation(event) {
+        if (!isTracking) return;
+
+        let heading = null;
+
+        if (isIOS) {
+            if (event.webkitCompassHeading !== undefined) {
+                heading = event.webkitCompassHeading;
+                compassCalibrated = true;
+            }
+        } else {
+            const alpha = event.alpha;
+            const beta = event.beta;
+            const gamma = event.gamma;
+
+            if (alpha !== null) {
+                if (Math.abs(beta) < 45 && Math.abs(gamma) < 45) {
+                    heading = 360 - alpha;
+                    compassCalibrated = true;
+                } else {
+                    if (compassCalibrated) {
+                        updateStatus('Maintenez le téléphone à plat', 'warning');
+                        calibrationTip.style.display = 'block';
+                    }
+                    heading = 360 - alpha;
+                }
+            }
+        }
+
+        if (heading !== null) {
+            currentHeading = heading;
+            smoothedHeading = smoothValue(smoothedHeading, currentHeading, SMOOTHING_FACTOR);
+            const rotation = qiblaAngle - smoothedHeading;
+            
+            requestAnimationFrame(() => {
+                compass.style.transform = `rotate(${rotation}deg)`;
+            });
+            
+            headingValue.textContent = Math.round(smoothedHeading) + "°";
+        }
+    }
+
+    // --- GESTION DU BOUTON DE DÉMARRAGE ---
+    async function startSensors() {
+        startBtn.disabled = true;
+        startBtn.textContent = 'ACTIVATION...';
+
+        // Vérifier l'état de la connexion au démarrage
+        updateOnlineStatus();
+
+        // Démarrage du GPS (avec fallback hors ligne)
+        startGPSTracking();
+
+        // Gestion des permissions iOS 13+
+        if (typeof DeviceOrientationEvent !== 'undefined' && 
+            typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const permission = await DeviceOrientationEvent.requestPermission();
+                if (permission === 'granted') {
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                    startBtn.style.display = 'none';
+                    if (!isOfflineMode) {
+                        updateStatus('Capteurs activés', 'success');
+                    }
+                } else {
+                    updateStatus('Permission boussole refusée', 'error');
+                    startBtn.disabled = false;
+                    startBtn.textContent = 'RÉESSAYER';
+                }
+            } catch (error) {
+                updateStatus('Erreur permission: ' + error.message, 'error');
+                startBtn.disabled = false;
+                startBtn.textContent = 'RÉESSAYER';
+            }
+        } else {
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', handleOrientation, true);
+                startBtn.style.display = 'none';
+                if (!isOfflineMode) {
+                    updateStatus('Capteurs activés', 'success');
+                }
+            } else {
+                updateStatus('Boussole non disponible', 'error');
+                startBtn.disabled = false;
+                startBtn.textContent = 'RÉESSAYER';
+            }
+        }
+    }
+
+    startBtn.addEventListener('click', startSensors);
+
+    // --- DÉTECTION DE CALIBRATION ---
+    let lastBeta = 0, lastGamma = 0;
+    let movementCounter = 0;
+
+    window.addEventListener('deviceorientation', (e) => {
+        if (!compassCalibrated && e.beta && e.gamma) {
+            const betaDiff = Math.abs(e.beta - lastBeta);
+            const gammaDiff = Math.abs(e.gamma - lastGamma);
+            
+            if (betaDiff > 10 || gammaDiff > 10) {
+                movementCounter++;
+                if (movementCounter > 20) {
+                    compassCalibrated = true;
+                    calibrationTip.style.display = 'none';
+                }
+            }
+            
+            lastBeta = e.beta;
+            lastGamma = e.gamma;
+        }
+    });
+
+    // --- NETTOYAGE ---
+    window.addEventListener('beforeunload', () => {
+        if (watchId !== null) {
+            navigator.geolocation.clearWatch(watchId);
+        }
+        window.removeEventListener('deviceorientation', handleOrientation);
+    });
+
+    // Afficher l'indicateur au chargement si hors ligne
+    updateOnlineStatus();
+
+})();
 </script>
 
 </body>
