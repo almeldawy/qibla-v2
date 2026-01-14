@@ -6,8 +6,8 @@ const FILES = [
   "/manifest.json",
   "/sw.js",
   "/fonts/Inter.woff2",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png"
+  "/icon-qibla-192.png",
+  "/icon-qibla-512.png"
 ];
 
 self.addEventListener("install", e => {
