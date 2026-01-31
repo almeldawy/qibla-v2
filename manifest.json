@@ -2,7 +2,7 @@
   "name": "Qibla Finder Pro",
   "short_name": "Qibla Pro",
   "description": "Application de boussole Qibla avec mode hors ligne pour trouver la direction de la Kaaba",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
